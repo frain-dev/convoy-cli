@@ -11,9 +11,6 @@ require (
 	github.com/stretchr/testify v1.8.1
 	go.mongodb.org/mongo-driver v1.11.1
 	gopkg.in/yaml.v2 v2.4.0
-)
-
-require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gobeam/mongo-go-pagination v0.0.7 // indirect
 	github.com/golang/snappy v0.0.4 // indirect

@@ -3,7 +3,6 @@ package convoy_cli
 import (
 	"encoding/json"
 
-	"github.com/frain-dev/convoy/datastore"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -11,6 +10,9 @@ type ListenRequest struct {
 	HostName string `json:"host_name"`
 	DeviceID string `json:"device_id"`
 	SourceID string `json:"source_id"`
+
+	Since     string `json:"-"`
+	ForwardTo string `json:"-"`
 	// EventTypes []string `json:"event_types"`
 }
 
@@ -20,9 +22,9 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	Device   *Device             `json:"device"`
-	Project  *Project            `json:"project"`
-	Endpoint *datastore.Endpoint `json:"endpoint"`
+	Device   *Device   `json:"device"`
+	Project  *Project  `json:"project"`
+	Endpoint *Endpoint `json:"endpoint"`
 }
 
 type Device struct {
@@ -32,29 +34,22 @@ type Device struct {
 	HostName   string             `json:"host_name,omitempty"`
 	Status     string             `json:"status,omitempty"`
 	LastSeenAt primitive.DateTime `json:"last_seen_at,omitempty"`
-	CreatedAt  primitive.DateTime `json:"created_at,omitempty"`
 }
 
 type Project struct {
-	UID            string              `json:"uid"`
-	Name           string              `json:"name"`
-	OrganisationID string              `json:"organisation_id"`
-	Type           string              `json:"type"`
-	CreatedAt      primitive.DateTime  `json:"created_at,omitempty"`
-	UpdatedAt      primitive.DateTime  `json:"updated_at,omitempty"`
-	DeletedAt      *primitive.DateTime `json:"deleted_at,omitempty"`
+	UID            string `json:"uid"`
+	Name           string `json:"name"`
+	OrganisationID string `json:"organisation_id"`
+	Type           string `json:"type"`
 }
 
 type Endpoint struct {
-	UID         string              `json:"uid"`
-	ProjectID   string              `json:"project_id"`
-	OwnerID     string              `json:"owner_id,omitempty"`
-	TargetURL   string              `json:"target_url"`
-	Title       string              `json:"title"`
-	Description string              `json:"description"`
-	CreatedAt   primitive.DateTime  `json:"created_at,omitempty"`
-	UpdatedAt   primitive.DateTime  `json:"updated_at,omitempty"`
-	DeletedAt   *primitive.DateTime `json:"deleted_at,omitempty"`
+	UID         string `json:"uid"`
+	ProjectID   string `json:"project_id"`
+	OwnerID     string `json:"owner_id,omitempty"`
+	TargetURL   string `json:"target_url"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
 }
 
 type AckEventDelivery struct {
