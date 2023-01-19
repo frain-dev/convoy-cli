@@ -10,7 +10,6 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
-	"strings"
 	"time"
 
 	convoyCli "github.com/frain-dev/convoy-cli"
@@ -41,7 +40,7 @@ const (
 func addListenCommand() *cobra.Command {
 	var since string
 	var source string
-	var events string
+	// var events string
 	var forwardTo string
 
 	cmd := &cobra.Command{
@@ -62,17 +61,10 @@ func addListenCommand() *cobra.Command {
 				log.Fatal("flag forward-to cannot be empty")
 			}
 
-			listenRequest := convoyCli.ListenRequest{
-				HostName:   c.Host,
-				DeviceID:   c.ActiveDeviceID,
-				SourceID:   source,
-				EventTypes: strings.Split(events, ","),
-			}
-
-			body, err := json.Marshal(listenRequest)
-			if err != nil {
-				log.Fatal("Error marshalling json:", err)
-			}
+			// enforce the source filter?
+			// if util.IsStringEmpty(source) {
+			// 	log.Fatal("flag source cannot be empty")
+			// }
 
 			hostInfo, err := url.Parse(c.Host)
 			if err != nil {
@@ -97,6 +89,17 @@ func addListenCommand() *cobra.Command {
 				}
 
 				log.Printf("will resend all discarded events after: %v", sinceTime)
+			}
+
+			listenRequest := convoyCli.ListenRequest{
+				HostName: c.Host,
+				DeviceID: c.ActiveDeviceID,
+				SourceID: source,
+			}
+
+			body, err := json.Marshal(listenRequest)
+			if err != nil {
+				log.Fatal("Error marshalling json:", err)
 			}
 
 			url := url.URL{Scheme: "ws", Host: hostInfo.Host, Path: "/stream/listen"}
@@ -184,8 +187,8 @@ func addListenCommand() *cobra.Command {
 
 	cmd.Flags().StringVar(&source, "source", "", "The source id of the source you want to receive events from (only applies to incoming projects)")
 	cmd.Flags().StringVar(&since, "since", "", "Send discarded events since a timestamp (e.g. 2013-01-02T13:23:37Z) or relative time (e.g. 42m for 42 minutes)")
-	cmd.Flags().StringVar(&events, "events", "*", "Events types")
 	cmd.Flags().StringVar(&forwardTo, "forward-to", "", "The host/web server you want to forward events to")
+	// cmd.Flags().StringVar(&events, "events", "*", "Events types")
 
 	return cmd
 }

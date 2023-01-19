@@ -8,10 +8,10 @@ import (
 )
 
 type ListenRequest struct {
-	HostName   string   `json:"host_name"`
-	DeviceID   string   `json:"device_id"`
-	SourceID   string   `json:"source_id"`
-	EventTypes []string `json:"event_types"`
+	HostName string `json:"host_name"`
+	DeviceID string `json:"device_id"`
+	SourceID string `json:"source_id"`
+	// EventTypes []string `json:"event_types"`
 }
 
 type LoginRequest struct {
@@ -65,10 +65,4 @@ type CLIEvent struct {
 	UID     string              `json:"uid"`
 	Headers map[string][]string `json:"headers"`
 	Data    json.RawMessage     `json:"data"`
-
-	// for filtering this event delivery
-	EventType  string `json:"-"`
-	DeviceID   string `json:"-"`
-	EndpointID string `json:"-"`
-	ProjectID  string `json:"-"`
 }
