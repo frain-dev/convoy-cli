@@ -46,7 +46,7 @@ func (d *Dispatcher) SendCliRequest(url string, method string, apiKey string, js
 
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("User-Agent", defaultUserAgent())
-	req.Header.Add("Authorization", fmt.Sprintf(" Bearer %s", apiKey))
+	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", apiKey))
 
 	r.RequestHeader = req.Header
 	r.URL = req.URL

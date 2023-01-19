@@ -2,7 +2,7 @@ package convoy_cli
 
 import (
 	"encoding/json"
-	convoyNet "github.com/frain-dev/convoy-cli/net"
+	"github.com/frain-dev/convoy-cli/net"
 	"github.com/frain-dev/convoy-cli/util"
 	"github.com/gorilla/websocket"
 	log "github.com/sirupsen/logrus"
@@ -161,7 +161,7 @@ func (l *Listener) HandleMessage(connection *websocket.Conn, url string) {
 		}
 
 		// send request to the recipient
-		d, err := convoyNet.NewDispatcher(time.Second*10, "")
+		d, err := net.NewDispatcher(time.Second*10, "")
 		if err != nil {
 			log.Error("an error occurred while forwarding the event", err)
 			continue

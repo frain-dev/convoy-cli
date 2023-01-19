@@ -8,8 +8,6 @@ import (
 	"testing"
 
 	"github.com/frain-dev/convoy/config"
-
-	"github.com/frain-dev/convoy/pkg/httpheader"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/require"
 )
@@ -22,9 +20,8 @@ func TestDispatcher_SendCliRequest(t *testing.T) {
 	buf := make([]byte, config.MaxResponseSize*2)
 	_, _ = rand.Read(buf)
 	type args struct {
-		headers  httpheader.HTTPHeader
-		method   string
 		url      string
+		method   string
 		apiKey   string
 		jsonData json.RawMessage
 	}
@@ -38,6 +35,8 @@ func TestDispatcher_SendCliRequest(t *testing.T) {
 		{
 			name: "should_send_message",
 			args: args{
+				url:      "https://google.com",
+				apiKey:   "12345gg",
 				method:   http.MethodPost,
 				jsonData: bytes.NewBufferString("testing").Bytes(),
 			},
@@ -47,46 +46,9 @@ func TestDispatcher_SendCliRequest(t *testing.T) {
 				Method:     http.MethodPost,
 				URL:        nil,
 				RequestHeader: http.Header{
-					"Content-Type":                         []string{"application/json"},
-					"User-Agent":                           []string{defaultUserAgent()},
-					config.DefaultSignatureHeader.String(): []string{"12345"}, // should equal hmac field above
-				},
-				ResponseHeader: nil,
-				Body:           successBody,
-				IP:             "",
-				Error:          "",
-			},
-			nFn: func() func() {
-				httpmock.Activate()
-
-				httpmock.RegisterResponder(http.MethodPost, "https://google.com",
-					httpmock.NewStringResponder(http.StatusOK, string(successBody)))
-
-				return func() {
-					httpmock.DeactivateAndReset()
-				}
-			},
-			wantErr: false,
-		},
-		{
-			name: "should_send_message_with_forwarded_headers",
-			args: args{
-				method:   http.MethodPost,
-				jsonData: bytes.NewBufferString("testing").Bytes(),
-				headers: map[string][]string{
-					"X-Test-Sig": {"abcdef"},
-				},
-			},
-			want: &Response{
-				Status:     "200",
-				StatusCode: http.StatusOK,
-				Method:     http.MethodPost,
-				URL:        nil,
-				RequestHeader: http.Header{
-					"Content-Type":                         []string{"application/json"},
-					"User-Agent":                           []string{defaultUserAgent()},
-					"X-Test-Sig":                           []string{"abcdef"},
-					config.DefaultSignatureHeader.String(): []string{"12345"}, // should equal hmac field above
+					"Content-Type":  []string{"application/json"},
+					"User-Agent":    []string{defaultUserAgent()},
+					"Authorization": []string{"Bearer 12345gg"},
 				},
 				ResponseHeader: nil,
 				Body:           successBody,
@@ -108,6 +70,8 @@ func TestDispatcher_SendCliRequest(t *testing.T) {
 		{
 			name: "should_cut_down_oversized_response_body",
 			args: args{
+				url:      "https://google.com",
+				apiKey:   "12345gg",
 				method:   http.MethodPost,
 				jsonData: bytes.NewBufferString("testing").Bytes(),
 			},
@@ -117,9 +81,9 @@ func TestDispatcher_SendCliRequest(t *testing.T) {
 				Method:     http.MethodPost,
 				URL:        nil,
 				RequestHeader: http.Header{
-					"Content-Type":                         []string{"application/json"},
-					"User-Agent":                           []string{defaultUserAgent()},
-					config.DefaultSignatureHeader.String(): []string{"12345"}, // should equal hmac field above
+					"Content-Type":  []string{"application/json"},
+					"User-Agent":    []string{defaultUserAgent()},
+					"Authorization": []string{"Bearer 12345gg"},
 				},
 				ResponseHeader: nil,
 				Body:           buf[:config.MaxResponseSize],
@@ -141,6 +105,8 @@ func TestDispatcher_SendCliRequest(t *testing.T) {
 		{
 			name: "should_refuse_connection",
 			args: args{
+				url:      "http://localhost",
+				apiKey:   "12345gg",
 				method:   http.MethodPost,
 				jsonData: bytes.NewBufferString("bossman").Bytes(),
 			},
@@ -149,50 +115,14 @@ func TestDispatcher_SendCliRequest(t *testing.T) {
 				StatusCode: 0,
 				Method:     http.MethodPost,
 				RequestHeader: http.Header{
-					"Content-Type":                         []string{"application/json"},
-					"User-Agent":                           []string{defaultUserAgent()},
-					config.DefaultSignatureHeader.String(): []string{"12345"}, // should equal hmac field above
+					"Content-Type":  []string{"application/json"},
+					"User-Agent":    []string{defaultUserAgent()},
+					"Authorization": []string{"Bearer 12345gg"},
 				},
 				ResponseHeader: nil,
 				Body:           nil,
 				IP:             "",
 				Error:          "connect: connection refused",
-			},
-			wantErr: true,
-		},
-		{
-			name: "should_error_for_empty_signature_hmac",
-			args: args{
-				method:   http.MethodPost,
-				jsonData: bytes.NewBufferString("bossman").Bytes(),
-			},
-			want: &Response{
-				Status:         "",
-				StatusCode:     0,
-				Method:         "",
-				RequestHeader:  nil,
-				ResponseHeader: nil,
-				Body:           nil,
-				IP:             "",
-				Error:          "signature header and hmac are required",
-			},
-			wantErr: true,
-		},
-		{
-			name: "should_error_for_empty_signature_header",
-			args: args{
-				method:   http.MethodPost,
-				jsonData: bytes.NewBufferString("bossman").Bytes(),
-			},
-			want: &Response{
-				Status:         "",
-				StatusCode:     0,
-				Method:         "",
-				RequestHeader:  nil,
-				ResponseHeader: nil,
-				Body:           nil,
-				IP:             "",
-				Error:          "signature header and hmac are required",
 			},
 			wantErr: true,
 		},
