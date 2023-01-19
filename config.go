@@ -117,6 +117,10 @@ func (c *Config) WriteToDisk() error {
 	return nil
 }
 
+func (c *Config) HasDefaultConfigFile() bool {
+	return c.hasDefaultConfigFile
+}
+
 func (c *Config) UpdateConfig(response *LoginResponse) error {
 	name := fmt.Sprintf("%s (%s)", response.Endpoint.Title, response.Project.Name)
 	c.ActiveEndpoint = name
