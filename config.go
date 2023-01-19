@@ -122,53 +122,57 @@ func (c *Config) HasDefaultConfigFile() bool {
 }
 
 func (c *Config) UpdateConfig(response *LoginResponse) error {
-	name := fmt.Sprintf("%s (%s)", response.Endpoint.Title, response.Project.Name)
-	c.ActiveEndpoint = name
+	var name string
+	if response.Endpoint != nil {
+		name = fmt.Sprintf("%s (%s)", response.Endpoint.Title, response.Project.Name)
+		c.ActiveEndpoint = name
+	}
+
 	c.ActiveDeviceID = response.Device.UID
 
-	if c.hasDefaultConfigFile {
-		if c.isNewHost {
-			// if the host is different from the current host in the config file,
-			// the data in the config file is overwritten
-			c.Endpoints = []ConfigEndpoint{
-				{
-					UID:      response.Endpoint.UID,
-					Name:     name,
-					ApiKey:   c.ActiveApiKey,
-					DeviceID: response.Device.UID,
-				},
-			}
-		}
-
-		if c.isNewApiKey {
-			if doesEndpointExist(c, response.Endpoint.UID) {
-				return fmt.Errorf("endpoint with ID (%s) has been added already", response.Endpoint.UID)
-			}
-
-			// If the api key provided is different from the active api key,
-			// we append the project returned to the list of projects within the config
-			c.Endpoints = append(c.Endpoints, ConfigEndpoint{
-				UID:      response.Endpoint.UID,
-				Name:     name,
-				ApiKey:   c.ActiveApiKey,
-				DeviceID: response.Device.UID,
-			})
-		}
-
-	} else {
-		// Make sure the directory holding our config exists
-		if err := os.MkdirAll(filepath.Dir(c.path), 0o755); err != nil {
-			return err
-		}
-		c.Endpoints = []ConfigEndpoint{
-			{
-				UID:      response.Endpoint.UID,
-				Name:     name,
-				ApiKey:   c.ActiveApiKey,
-				DeviceID: response.Device.UID,
-			},
-		}
-	}
+	//if c.hasDefaultConfigFile {
+	//	if c.isNewHost {
+	//		// if the host is different from the current host in the config file,
+	//		// the data in the config file is overwritten
+	//		c.Endpoints = []ConfigEndpoint{
+	//			{
+	//				UID:      response.Endpoint.UID,
+	//				Name:     name,
+	//				ApiKey:   c.ActiveApiKey,
+	//				DeviceID: response.Device.UID,
+	//			},
+	//		}
+	//	}
+	//
+	//	if c.isNewApiKey {
+	//		if doesEndpointExist(c, response.Endpoint.UID) {
+	//			return fmt.Errorf("endpoint with ID (%s) has been added already", response.Endpoint.UID)
+	//		}
+	//
+	//		// If the api key provided is different from the active api key,
+	//		// we append the project returned to the list of projects within the config
+	//		c.Endpoints = append(c.Endpoints, ConfigEndpoint{
+	//			UID:      response.Endpoint.UID,
+	//			Name:     name,
+	//			ApiKey:   c.ActiveApiKey,
+	//			DeviceID: response.Device.UID,
+	//		})
+	//	}
+	//
+	//} else {
+	//	// Make sure the directory holding our config exists
+	//	if err := os.MkdirAll(filepath.Dir(c.path), 0o755); err != nil {
+	//		return err
+	//	}
+	//	c.Endpoints = []ConfigEndpoint{
+	//		{
+	//			UID:      response.Endpoint.UID,
+	//			Name:     name,
+	//			ApiKey:   c.ActiveApiKey,
+	//			DeviceID: response.Device.UID,
+	//		},
+	//	}
+	//}
 
 	err := c.WriteToDisk()
 	if err != nil {

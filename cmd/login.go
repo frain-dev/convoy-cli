@@ -81,7 +81,10 @@ func addLoginCommand() *cobra.Command {
 
 			log.Info("Login Success!")
 			log.Infof("Project: %s", response.Project.Name)
-			log.Infof("Endpoint: %s", response.Endpoint.Title)
+
+			if response.Endpoint != nil {
+				log.Infof("Endpoint: %s", response.Endpoint.Title)
+			}
 			return nil
 		},
 	}
