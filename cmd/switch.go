@@ -14,11 +14,11 @@ import (
 
 func addSwitchCommand() *cobra.Command {
 	var appName string
-	var endpointId string
+	var projectId string
 
 	cmd := &cobra.Command{
 		Use:               "switch",
-		Short:             "Switches the current application context",
+		Short:             "Switches the current project context",
 		PersistentPreRun:  func(cmd *cobra.Command, args []string) {},
 		PersistentPostRun: func(cmd *cobra.Command, args []string) {},
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -28,50 +28,47 @@ func addSwitchCommand() *cobra.Command {
 			}
 
 			if !c.HasDefaultConfigFile() {
-				return errors.New("login with your cli token to be able to use the switch command")
+				return errors.New("login with your personal access key to be able to use the switch command")
 			}
 
-			if util.IsStringEmpty(appName) && util.IsStringEmpty(endpointId) {
+			if util.IsStringEmpty(appName) && util.IsStringEmpty(projectId) {
 				return errors.New("one of app name or app id is required")
 			}
 
-			var endpoint *convoyCli.ConfigEndpoint
+			var project *convoyCli.ConfigProject
 			if !util.IsStringEmpty(appName) {
-				endpoint = FindEndpointByName(c.Endpoints, appName)
-				if endpoint == nil {
+				project = FindProjectByName(c.Projects, appName)
+				if project == nil {
 					return fmt.Errorf("app with name: %s not found", appName)
 				}
 			}
 
-			if !util.IsStringEmpty(endpointId) {
-				endpoint = FindEndpointById(c.Endpoints, endpointId)
-				if endpoint == nil {
-					return fmt.Errorf("endpoint with id: %s not found", endpointId)
+			if !util.IsStringEmpty(projectId) {
+				project = FindProjectById(c.Projects, projectId)
+				if project == nil {
+					return fmt.Errorf("project with id: %s not found", projectId)
 				}
 			}
 
-			c.ActiveEndpoint = endpoint.Name
-			c.ActiveDeviceID = endpoint.DeviceID
-			c.ActiveApiKey = endpoint.ApiKey
+			c.ActiveProjectID = project.UID
 
 			err = c.WriteToDisk()
 			if err != nil {
 				return err
 			}
 
-			log.Infof("%s is now the active endpoint", c.ActiveEndpoint)
+			log.Infof("%s is now the active project", c.ActiveProjectID)
 			return nil
 		},
 	}
 
-	cmd.Flags().StringVar(&appName, "name", "", "Endpoint Name")
-	cmd.Flags().StringVar(&endpointId, "id", "", "Endpoint Id")
+	cmd.Flags().StringVar(&projectId, "id", "", "Endpoint Id")
 
 	return cmd
 }
 
-func FindEndpointByName(endpoints []convoyCli.ConfigEndpoint, endpointName string) *convoyCli.ConfigEndpoint {
-	var endpoint *convoyCli.ConfigEndpoint
+func FindProjectByName(endpoints []convoyCli.ConfigProject, endpointName string) *convoyCli.ConfigProject {
+	var project *convoyCli.ConfigProject
 
 	for _, endpoint := range endpoints {
 		if strings.TrimSpace(strings.ToLower(endpoint.Name)) == strings.TrimSpace(strings.ToLower(endpointName)) {
@@ -79,17 +76,17 @@ func FindEndpointByName(endpoints []convoyCli.ConfigEndpoint, endpointName strin
 		}
 	}
 
-	return endpoint
+	return project
 }
 
-func FindEndpointById(endpoints []convoyCli.ConfigEndpoint, endpointId string) *convoyCli.ConfigEndpoint {
-	var endpoint *convoyCli.ConfigEndpoint
+func FindProjectById(projects []convoyCli.ConfigProject, projectId string) *convoyCli.ConfigProject {
+	var project *convoyCli.ConfigProject
 
-	for _, endpoint := range endpoints {
-		if strings.TrimSpace(strings.ToLower(endpoint.UID)) == strings.TrimSpace(strings.ToLower(endpointId)) {
+	for _, endpoint := range projects {
+		if strings.TrimSpace(strings.ToLower(endpoint.UID)) == strings.TrimSpace(strings.ToLower(projectId)) {
 			return &endpoint
 		}
 	}
 
-	return endpoint
+	return project
 }

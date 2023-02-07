@@ -25,10 +25,10 @@ func addListEndpointsCommand() *cobra.Command {
 			t.SetOutputMirror(os.Stdout)
 			t.AppendHeader(table.Row{"Current Endpoint", "ID", "Name"})
 
-			for _, project := range c.Endpoints {
+			for _, project := range c.Projects {
 				var current string
 
-				if project.Name == c.ActiveEndpoint {
+				if project.Name == c.ActiveProjectID {
 					current = "*"
 				}
 

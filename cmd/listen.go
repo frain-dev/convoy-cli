@@ -60,9 +60,12 @@ func addListenCommand() *cobra.Command {
 				log.Printf("will resend all discarded events after: %v", sinceTime)
 			}
 
+			p := FindProjectById(c.Projects, c.ActiveProjectID)
+
 			listenRequest := convoyCli.ListenRequest{
 				HostName:  c.Host,
-				DeviceID:  c.ActiveDeviceID,
+				ProjectID: c.ActiveProjectID,
+				DeviceID:  p.DeviceID,
 				SourceID:  source,
 				Since:     since,
 				ForwardTo: forwardTo,

@@ -2,7 +2,6 @@ package convoy_cli
 
 import (
 	"errors"
-	"fmt"
 	"github.com/frain-dev/convoy-cli/util"
 	"gopkg.in/yaml.v3"
 	"os"
@@ -14,21 +13,21 @@ const (
 )
 
 type Config struct {
-	Host                 string           `yaml:"host"`
-	ActiveDeviceID       string           `yaml:"active_device_id"`
-	ActiveApiKey         string           `yaml:"active_api_key"`
-	ActiveEndpoint       string           `yaml:"active_endpoint"`
-	Endpoints            []ConfigEndpoint `yaml:"endpoints"`
+	Host                 string          `yaml:"host"`
+	ActiveApiKey         string          `yaml:"active_api_key"`
+	ActiveProjectID      string          `yaml:"active_project_id"`
+	Projects             []ConfigProject `yaml:"projects"`
 	path                 string
 	hasDefaultConfigFile bool
-	isNewApiKey          bool
 	isNewHost            bool
 }
 
-type ConfigEndpoint struct {
-	UID      string `yaml:"uid"`
-	Name     string `yaml:"name"`
-	ApiKey   string `yaml:"api_key"`
+type ConfigProject struct {
+	UID  string `yaml:"uid"`
+	Name string `yaml:"name"`
+	Host string `yaml:"host"`
+	Type string `yaml:"type"`
+	//ApiKey   string `yaml:"api_key"`
 	DeviceID string `yaml:"device_id"`
 }
 
@@ -92,7 +91,6 @@ func NewConfig(host, apiKey string) (*Config, error) {
 		}
 
 		if !util.IsStringEmpty(apiKey) {
-			c.isNewApiKey = IsNewApiKey(c, apiKey)
 			c.ActiveApiKey = apiKey
 		}
 		return c, nil
@@ -110,7 +108,7 @@ func (c *Config) WriteToDisk() error {
 		return err
 	}
 
-	if err := os.WriteFile(c.path, []byte(d), 0o644); err != nil {
+	if err := os.WriteFile(c.path, d, 0o644); err != nil {
 		return err
 	}
 
@@ -122,19 +120,29 @@ func (c *Config) HasDefaultConfigFile() bool {
 }
 
 func (c *Config) UpdateConfig(response *LoginResponse) error {
-	var name string
-	if response.Endpoint != nil {
-		name = fmt.Sprintf("%s (%s)", response.Endpoint.Title, response.Project.Name)
-		c.ActiveEndpoint = name
+	if len(response.Projects) > 0 {
+		c.ActiveProjectID = response.Projects[0].Project.UID
 	}
 
-	c.ActiveDeviceID = response.Device.UID
+	c.Projects = make([]ConfigProject, 0, len(response.Projects))
+
+	for i := range response.Projects {
+		rp := &response.Projects[i]
+
+		c.Projects = append(c.Projects, ConfigProject{
+			UID:      rp.Project.UID,
+			Name:     rp.Project.Name,
+			Host:     c.Host,
+			Type:     rp.Project.Type,
+			DeviceID: rp.Device.UID,
+		})
+	}
 
 	//if c.hasDefaultConfigFile {
 	//	if c.isNewHost {
 	//		// if the host is different from the current host in the config file,
 	//		// the data in the config file is overwritten
-	//		c.Endpoints = []ConfigEndpoint{
+	//		c.Projects = []ConfigProject{
 	//			{
 	//				UID:      response.Endpoint.UID,
 	//				Name:     name,
@@ -151,7 +159,7 @@ func (c *Config) UpdateConfig(response *LoginResponse) error {
 	//
 	//		// If the api key provided is different from the active api key,
 	//		// we append the project returned to the list of projects within the config
-	//		c.Endpoints = append(c.Endpoints, ConfigEndpoint{
+	//		c.Projects = append(c.Projects, ConfigProject{
 	//			UID:      response.Endpoint.UID,
 	//			Name:     name,
 	//			ApiKey:   c.ActiveApiKey,
@@ -164,7 +172,7 @@ func (c *Config) UpdateConfig(response *LoginResponse) error {
 	//	if err := os.MkdirAll(filepath.Dir(c.path), 0o755); err != nil {
 	//		return err
 	//	}
-	//	c.Endpoints = []ConfigEndpoint{
+	//	c.Projects = []ConfigProject{
 	//		{
 	//			UID:      response.Endpoint.UID,
 	//			Name:     name,
@@ -183,7 +191,7 @@ func (c *Config) UpdateConfig(response *LoginResponse) error {
 }
 
 func doesEndpointExist(c *Config, endpointId string) bool {
-	for _, endpoint := range c.Endpoints {
+	for _, endpoint := range c.Projects {
 		if endpoint.UID == endpointId {
 			return true
 		}
@@ -201,16 +209,4 @@ func HasDefaultConfigFile(path string) bool {
 
 func IsNewHost(currentHost, newHost string) bool {
 	return currentHost != newHost
-}
-
-// The api key is considered new if it doesn't already
-// exist within the config file
-func IsNewApiKey(c *Config, apiKey string) bool {
-	for _, project := range c.Endpoints {
-		if project.ApiKey == apiKey {
-			return false
-		}
-	}
-
-	return true
 }

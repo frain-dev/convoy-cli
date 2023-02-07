@@ -40,13 +40,12 @@ func addLoginCommand() *cobra.Command {
 				return errors.New("api key is required")
 			}
 
-			deviceID := findDeviceID(c)
 			hostName, err := generateDeviceHostName()
 			if err != nil {
 				return err
 			}
 
-			loginRequest := &convoyCli.LoginRequest{HostName: hostName, DeviceID: deviceID}
+			loginRequest := &convoyCli.LoginRequest{HostName: hostName}
 			body, err := json.Marshal(loginRequest)
 			if err != nil {
 				return err
@@ -80,31 +79,17 @@ func addLoginCommand() *cobra.Command {
 			}
 
 			log.Info("Login Success!")
-			log.Infof("Project: %s", response.Project.Name)
+			log.Infof("Name: %s", response.UserName)
+			log.Infof("Host: %s", host)
 
-			if response.Endpoint != nil {
-				log.Infof("Endpoint: %s", response.Endpoint.Title)
-			}
 			return nil
 		},
 	}
 
 	cmd.Flags().StringVar(&apiKey, "api-key", "", "API Key")
-	cmd.Flags().StringVar(&host, "host", "", "Host")
+	cmd.Flags().StringVar(&host, "host", "cli.getconvoy.io", "Host")
 
 	return cmd
-}
-
-func findDeviceID(c *convoyCli.Config) string {
-	var deviceID string
-
-	for _, app := range c.Endpoints {
-		if app.ApiKey == c.ActiveApiKey {
-			return app.DeviceID
-		}
-	}
-
-	return deviceID
 }
 
 // generateDeviceHostName uses the machine's host name and the mac address to generate a predictable unique id per device
