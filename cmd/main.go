@@ -22,8 +22,7 @@ func main() {
 
 	cmd.AddCommand(addListenCommand())
 	cmd.AddCommand(addLoginCommand())
-	cmd.AddCommand(addSwitchCommand())
-	cmd.AddCommand(addListEndpointsCommand())
+	cmd.AddCommand(addProjectCommand())
 
 	err = cmd.Execute()
 	if err != nil {
