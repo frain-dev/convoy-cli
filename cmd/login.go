@@ -13,7 +13,6 @@ import (
 	convoyCli "github.com/frain-dev/convoy-cli"
 	convoyNet "github.com/frain-dev/convoy-cli/net"
 	"github.com/frain-dev/convoy-cli/util"
-	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -78,9 +77,9 @@ func addLoginCommand() *cobra.Command {
 				return err
 			}
 
-			log.Info("Login Success!")
-			log.Infof("Name: %s", response.UserName)
-			log.Infof("Host: %s", host)
+			fmt.Println("Login Success!")
+			fmt.Println("Name:", response.UserName)
+			fmt.Println("Host:", host)
 
 			return nil
 		},
