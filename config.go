@@ -2,6 +2,7 @@ package convoy_cli
 
 import (
 	"errors"
+	"fmt"
 	"github.com/frain-dev/convoy-cli/util"
 	"gopkg.in/yaml.v3"
 	"os"
@@ -108,8 +109,8 @@ func (c *Config) WriteToDisk() error {
 		return err
 	}
 
-	if err := os.WriteFile(c.path, d, 0o644); err != nil {
-		return err
+	if err = os.WriteFile(c.path, d, 0644); err != nil {
+		return fmt.Errorf("failed to write config to disk: %v", err)
 	}
 
 	return nil
