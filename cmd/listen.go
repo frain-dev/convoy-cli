@@ -76,7 +76,7 @@ func addListenCommand() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVar(&source, "source", "", "The source id of the source you want to receive events from (only applies to incoming projects)")
+	cmd.Flags().StringVar(&source, "source-id", "", "The source id of the source you want to receive events from (only applies to incoming projects)")
 	cmd.Flags().StringVar(&since, "since", "", "Send discarded events since a timestamp (e.g. 2013-01-02T13:23:37Z) or relative time (e.g. 42m for 42 minutes)")
 	cmd.Flags().StringVar(&forwardTo, "forward-to", "", "The host/web server you want to forward events to")
 	// cmd.Flags().StringVar(&events, "events", "*", "Events types")

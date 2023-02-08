@@ -87,7 +87,7 @@ func addLoginCommand() *cobra.Command {
 	}
 
 	cmd.Flags().StringVar(&apiKey, "api-key", "", "API Key")
-	cmd.Flags().StringVar(&host, "host", "cli.getconvoy.io", "Host")
+	cmd.Flags().StringVar(&host, "host", "https://cli.getconvoy.io", "Host")
 
 	return cmd
 }

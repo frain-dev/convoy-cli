@@ -10,8 +10,6 @@ import (
 
 	"github.com/frain-dev/convoy/util"
 	"github.com/spf13/cobra"
-
-	"github.com/frain-dev/convoy/pkg/log"
 )
 
 func addProjectCommand() *cobra.Command {
@@ -32,8 +30,8 @@ func addProjectCommand() *cobra.Command {
 		},
 	}
 
-	cmd.LocalFlags().BoolVar(&list, "list", false, "List all projects")
-	cmd.LocalFlags().StringVar(&projectId, "switch-to", "", "Switch to specified project")
+	cmd.Flags().BoolVar(&list, "list", false, "List all projects")
+	cmd.Flags().StringVar(&projectId, "switch-to", "", "Switch to specified project")
 
 	return cmd
 }
@@ -64,7 +62,7 @@ func switchProject(projectId string) error {
 		return err
 	}
 
-	log.Infof("Successfully switched to %s", project.Name)
+	fmt.Printf("Successfully switched to %s\n", project.Name)
 	return nil
 }
 
@@ -81,7 +79,7 @@ func listProjects() error {
 			status = "Active"
 		}
 
-		v := "- ID: %s\nName: %s\nType: %s\nHost: %s\nStatus: %s\n"
+		v := "- ID: %s\n Name: %s\n Type: %s\n Host: %s\n Status: %s\n\n"
 		formated := fmt.Sprintf(v, p.UID, p.Name, p.Type, p.Host, status)
 
 		buf.WriteString(formated)
@@ -89,18 +87,6 @@ func listProjects() error {
 
 	buf.WriteTo(os.Stdout)
 	return nil
-}
-
-func FindProjectByName(endpoints []convoyCli.ConfigProject, endpointName string) *convoyCli.ConfigProject {
-	var project *convoyCli.ConfigProject
-
-	for _, endpoint := range endpoints {
-		if strings.TrimSpace(strings.ToLower(endpoint.Name)) == strings.TrimSpace(strings.ToLower(endpointName)) {
-			return &endpoint
-		}
-	}
-
-	return project
 }
 
 func FindProjectById(projects []convoyCli.ConfigProject, projectId string) *convoyCli.ConfigProject {
