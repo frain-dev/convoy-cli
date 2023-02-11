@@ -6,10 +6,10 @@ import (
 )
 
 type ListenRequest struct {
-	HostName  string `json:"host_name"`
-	ProjectID string `json:"project_id"`
-	DeviceID  string `json:"device_id"`
-	SourceID  string `json:"source_id"`
+	HostName   string `json:"host_name"`
+	ProjectID  string `json:"project_id"`
+	DeviceID   string `json:"device_id"`
+	SourceName string `json:"source_name"`
 
 	Since     string `json:"-"`
 	ForwardTo string `json:"-"`

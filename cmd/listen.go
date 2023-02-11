@@ -13,7 +13,7 @@ import (
 
 func addListenCommand() *cobra.Command {
 	var since string
-	var source string
+	var sourceName string
 	// var events string
 	var forwardTo string
 
@@ -30,9 +30,9 @@ func addListenCommand() *cobra.Command {
 				log.Fatal("flag forward-to cannot be empty")
 			}
 
-			// TODO(all): enforce the source filter?
-			// if util.IsStringEmpty(source) {
-			// 	log.Fatal("flag source cannot be empty")
+			// TODO(all): enforce the sourceName filter?
+			// if util.IsStringEmpty(sourceName) {
+			// 	log.Fatal("flag sourceName cannot be empty")
 			// }
 
 			hostInfo, err := url.Parse(c.Host)
@@ -63,12 +63,12 @@ func addListenCommand() *cobra.Command {
 			p := FindProjectById(c.Projects, c.ActiveProjectID)
 
 			listenRequest := convoyCli.ListenRequest{
-				HostName:  c.Host,
-				ProjectID: c.ActiveProjectID,
-				DeviceID:  p.DeviceID,
-				SourceID:  source,
-				Since:     since,
-				ForwardTo: forwardTo,
+				HostName:   c.Host,
+				ProjectID:  c.ActiveProjectID,
+				DeviceID:   p.DeviceID,
+				SourceName: sourceName,
+				Since:      since,
+				ForwardTo:  forwardTo,
 			}
 
 			l := convoyCli.NewListener(c)
@@ -76,7 +76,7 @@ func addListenCommand() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVar(&source, "source-id", "", "The source id of the source you want to receive events from (only applies to incoming projects)")
+	cmd.Flags().StringVar(&sourceName, "source-name", "", "The name of the source you want to receive events from (only applies to incoming projects)")
 	cmd.Flags().StringVar(&since, "since", "", "Send discarded events since a timestamp (e.g. 2013-01-02T13:23:37Z) or relative time (e.g. 42m for 42 minutes)")
 	cmd.Flags().StringVar(&forwardTo, "forward-to", "", "The host/web server you want to forward events to")
 	// cmd.Flags().StringVar(&events, "events", "*", "Events types")
