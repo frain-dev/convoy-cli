@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	log "github.com/sirupsen/logrus"
 	"net"
 	"net/http"
 	"os"
@@ -25,8 +26,11 @@ func addLoginCommand() *cobra.Command {
 		Short:             "Logs into your Convoy instance using a CLI API Key",
 		SilenceUsage:      true,
 		PersistentPostRun: func(cmd *cobra.Command, args []string) {},
-		RunE: func(cmd *cobra.Command, args []string) error {
-			return login(host, apiKey, false)
+		Run: func(cmd *cobra.Command, args []string) {
+			err := login(host, apiKey, false)
+			if err != nil {
+				log.Fatal(err)
+			}
 		},
 	}
 

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	convoyCli "github.com/frain-dev/convoy-cli"
+	log "github.com/sirupsen/logrus"
 	"os"
 	"strings"
 
@@ -23,16 +24,25 @@ func addProjectCommand() *cobra.Command {
 		SilenceUsage:      true,
 		PersistentPreRun:  func(cmd *cobra.Command, args []string) {},
 		PersistentPostRun: func(cmd *cobra.Command, args []string) {},
-		RunE: func(cmd *cobra.Command, args []string) error {
+		Run: func(cmd *cobra.Command, args []string) {
 			if list {
-				return listProjects()
+				err := listProjects()
+				if err != nil {
+					log.Fatal(err)
+				}
 			}
 
 			if refresh {
-				return login("", "", true)
+				err := login("", "", true)
+				if err != nil {
+					log.Fatal(err)
+				}
 			}
 
-			return switchProject(projectId)
+			err := switchProject(projectId)
+			if err != nil {
+				log.Fatal(err)
+			}
 		},
 	}
 

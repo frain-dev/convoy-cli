@@ -2,6 +2,7 @@ package main
 
 import (
 	cli "github.com/frain-dev/convoy-cli"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -12,8 +13,11 @@ func addLogoutCommand() *cobra.Command {
 		SilenceUsage:      true,
 		PersistentPreRun:  func(cmd *cobra.Command, args []string) {},
 		PersistentPostRun: func(cmd *cobra.Command, args []string) {},
-		RunE: func(cmd *cobra.Command, args []string) error {
-			return cli.DeleteConfigFile()
+		Run: func(cmd *cobra.Command, args []string) {
+			err := cli.DeleteConfigFile()
+			if err != nil {
+				log.Fatal(err)
+			}
 		},
 	}
 
