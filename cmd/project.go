@@ -14,6 +14,7 @@ import (
 
 func addProjectCommand() *cobra.Command {
 	var list bool
+	var refresh bool
 	var projectId string
 
 	cmd := &cobra.Command{
@@ -26,11 +27,16 @@ func addProjectCommand() *cobra.Command {
 				return listProjects()
 			}
 
+			if refresh {
+				return login("", "", true)
+			}
+
 			return switchProject(projectId)
 		},
 	}
 
 	cmd.Flags().BoolVar(&list, "list", false, "List all projects")
+	cmd.Flags().BoolVar(&refresh, "refresh", false, "Refresh the project list")
 	cmd.Flags().StringVar(&projectId, "switch-to", "", "Switch to specified project")
 
 	return cmd
@@ -52,7 +58,7 @@ func switchProject(projectId string) error {
 
 	project := FindProjectById(c.Projects, projectId)
 	if project == nil {
-		return fmt.Errorf("project with id: %s not found", projectId)
+		return fmt.Errorf("project with id: %s not found\nRun `convoy-cli project --refresh` to refresh the project list", projectId)
 	}
 
 	c.ActiveProjectID = project.UID
