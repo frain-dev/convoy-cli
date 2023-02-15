@@ -2,14 +2,14 @@ package convoy_cli
 
 import (
 	"encoding/json"
-
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type ListenRequest struct {
-	HostName string `json:"host_name"`
-	DeviceID string `json:"device_id"`
-	SourceID string `json:"source_id"`
+	HostName   string `json:"host_name"`
+	ProjectID  string `json:"project_id"`
+	DeviceID   string `json:"device_id"`
+	SourceName string `json:"source_name"`
 
 	Since     string `json:"-"`
 	ForwardTo string `json:"-"`
@@ -22,9 +22,17 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	Device   *Device   `json:"device"`
-	Project  *Project  `json:"project"`
-	Endpoint *Endpoint `json:"endpoint"`
+	Projects []ProjectDevice `json:"projects"`
+	UserName string          `json:"user_name"`
+
+	//Device   *Device   `json:"device"`
+	//Project  *Project  `json:"project"`
+	//Endpoint *Endpoint `json:"endpoint"`
+}
+
+type ProjectDevice struct {
+	Project *Project `json:"project"`
+	Device  *Device  `json:"device"`
 }
 
 type Device struct {

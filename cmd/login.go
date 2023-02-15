@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	log "github.com/sirupsen/logrus"
 	"net"
 	"net/http"
 	"os"
@@ -13,7 +14,6 @@ import (
 	convoyCli "github.com/frain-dev/convoy-cli"
 	convoyNet "github.com/frain-dev/convoy-cli/net"
 	"github.com/frain-dev/convoy-cli/util"
-	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -24,87 +24,84 @@ func addLoginCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:               "login",
 		Short:             "Logs into your Convoy instance using a CLI API Key",
-		PersistentPreRun:  func(cmd *cobra.Command, args []string) {},
+		SilenceUsage:      true,
 		PersistentPostRun: func(cmd *cobra.Command, args []string) {},
-		RunE: func(cmd *cobra.Command, args []string) error {
-			c, err := convoyCli.NewConfig(host, apiKey)
+		Run: func(cmd *cobra.Command, args []string) {
+			err := login(host, apiKey, false)
 			if err != nil {
-				return err
+				log.Fatal(err)
 			}
-
-			if util.IsStringEmpty(c.Host) {
-				return errors.New("host is required")
-			}
-
-			if util.IsStringEmpty(c.ActiveApiKey) {
-				return errors.New("api key is required")
-			}
-
-			deviceID := findDeviceID(c)
-			hostName, err := generateDeviceHostName()
-			if err != nil {
-				return err
-			}
-
-			loginRequest := &convoyCli.LoginRequest{HostName: hostName, DeviceID: deviceID}
-			body, err := json.Marshal(loginRequest)
-			if err != nil {
-				return err
-			}
-
-			var response *convoyCli.LoginResponse
-
-			dispatch, err := convoyNet.NewDispatcher(time.Second*10, "")
-			if err != nil {
-				return err
-			}
-
-			url := fmt.Sprintf("%s/stream/login", c.Host)
-			resp, err := dispatch.SendCliRequest(url, http.MethodPost, c.ActiveApiKey, body)
-			if err != nil {
-				return err
-			}
-
-			if resp.StatusCode != 200 {
-				return errors.New(string(resp.Body))
-			}
-
-			err = json.Unmarshal(resp.Body, &response)
-			if err != nil {
-				return err
-			}
-
-			err = c.UpdateConfig(response)
-			if err != nil {
-				return err
-			}
-
-			log.Info("Login Success!")
-			log.Infof("Project: %s", response.Project.Name)
-
-			if response.Endpoint != nil {
-				log.Infof("Endpoint: %s", response.Endpoint.Title)
-			}
-			return nil
 		},
 	}
 
 	cmd.Flags().StringVar(&apiKey, "api-key", "", "API Key")
-	cmd.Flags().StringVar(&host, "host", "", "Host")
+	cmd.Flags().StringVar(&host, "host", "https://cli.getconvoy.io", "Host")
 
 	return cmd
 }
 
-func findDeviceID(c *convoyCli.Config) string {
-	var deviceID string
-
-	for _, app := range c.Endpoints {
-		if app.ApiKey == c.ActiveApiKey {
-			return app.DeviceID
-		}
+func login(host, apiKey string, isRefresh bool) error {
+	c, err := convoyCli.NewConfig(host, apiKey)
+	if err != nil {
+		return err
 	}
 
-	return deviceID
+	if util.IsStringEmpty(c.Host) {
+		return errors.New("host is required")
+	}
+
+	if util.IsStringEmpty(c.ActiveApiKey) {
+		return errors.New("api key is required")
+	}
+
+	hostName, err := generateDeviceHostName()
+	if err != nil {
+		return err
+	}
+
+	loginRequest := &convoyCli.LoginRequest{HostName: hostName}
+	body, err := json.Marshal(loginRequest)
+	if err != nil {
+		return err
+	}
+
+	var response *convoyCli.LoginResponse
+
+	dispatch, err := convoyNet.NewDispatcher(time.Second*10, "")
+	if err != nil {
+		return err
+	}
+
+	url := fmt.Sprintf("%s/stream/login", c.Host)
+	resp, err := dispatch.SendCliRequest(url, http.MethodPost, c.ActiveApiKey, body)
+	if err != nil {
+		return err
+	}
+
+	if resp.StatusCode != 200 {
+		return errors.New(string(resp.Body))
+	}
+
+	err = json.Unmarshal(resp.Body, &response)
+	if err != nil {
+		return err
+	}
+
+	err = c.UpdateConfig(response)
+	if err != nil {
+		return err
+	}
+
+	if isRefresh {
+		fmt.Println("Refresh Project list Successful!")
+		return nil
+	}
+
+	fmt.Println("Login Success!")
+	fmt.Println("Name:", response.UserName)
+	fmt.Println("Host:", host)
+
+	return nil
 }
 
 // generateDeviceHostName uses the machine's host name and the mac address to generate a predictable unique id per device
