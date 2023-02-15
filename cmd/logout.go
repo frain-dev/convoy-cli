@@ -9,6 +9,7 @@ func addLogoutCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:               "logout",
 		Short:             "Logs out of your Convoy instance",
+		SilenceUsage:      true,
 		PersistentPreRun:  func(cmd *cobra.Command, args []string) {},
 		PersistentPostRun: func(cmd *cobra.Command, args []string) {},
 		RunE: func(cmd *cobra.Command, args []string) error {

@@ -18,8 +18,9 @@ func addListenCommand() *cobra.Command {
 	var forwardTo string
 
 	cmd := &cobra.Command{
-		Use:   "listen",
-		Short: "Starts a websocket client that listens to events streamed by the server",
+		Use:          "listen",
+		Short:        "Starts a websocket client that listens to events streamed by the server",
+		SilenceUsage: true,
 		Run: func(cmd *cobra.Command, args []string) {
 			c, err := convoyCli.LoadConfig()
 			if err != nil {

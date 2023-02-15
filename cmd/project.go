@@ -19,7 +19,8 @@ func addProjectCommand() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:               "project",
-		Short:             "Switches the current project context or List all projects",
+		Short:             "Switch, List or Refresh projects",
+		SilenceUsage:      true,
 		PersistentPreRun:  func(cmd *cobra.Command, args []string) {},
 		PersistentPostRun: func(cmd *cobra.Command, args []string) {},
 		RunE: func(cmd *cobra.Command, args []string) error {
