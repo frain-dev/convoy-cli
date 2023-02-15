@@ -30,6 +30,7 @@ func addProjectCommand() *cobra.Command {
 				if err != nil {
 					log.Fatal(err)
 				}
+				return
 			}
 
 			if refresh {
@@ -37,6 +38,7 @@ func addProjectCommand() *cobra.Command {
 				if err != nil {
 					log.Fatal(err)
 				}
+				return
 			}
 
 			err := switchProject(projectId)
