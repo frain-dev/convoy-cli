@@ -91,8 +91,8 @@ func listProjects() error {
 		buf.WriteString(formated)
 	}
 
-	buf.WriteTo(os.Stdout)
-	return nil
+	_, err = buf.WriteTo(os.Stdout)
+	return err
 }
 
 func FindProjectById(projects []convoyCli.ConfigProject, projectId string) *convoyCli.ConfigProject {
