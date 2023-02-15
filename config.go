@@ -137,7 +137,7 @@ func (c *Config) HasDefaultConfigFile() bool {
 }
 
 func (c *Config) UpdateConfig(response *LoginResponse) error {
-	if len(response.Projects) > 0 {
+	if len(response.Projects) > 0 && util.IsStringEmpty(c.ActiveProjectID) {
 		c.ActiveProjectID = response.Projects[0].Project.UID
 	}
 
