@@ -32,6 +32,17 @@ type ConfigProject struct {
 	DeviceID string `yaml:"device_id"`
 }
 
+func DeleteConfigFile() error {
+	homedir, err := os.UserHomeDir()
+	if err != nil {
+		return err
+	}
+
+	path := filepath.Join(homedir, defaultConfigDir)
+
+	return os.Remove(path)
+}
+
 func LoadConfig() (*Config, error) {
 	homedir, err := os.UserHomeDir()
 	if err != nil {

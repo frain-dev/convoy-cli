@@ -23,6 +23,7 @@ func main() {
 	cmd.AddCommand(addListenCommand())
 	cmd.AddCommand(addLoginCommand())
 	cmd.AddCommand(addProjectCommand())
+	cmd.AddCommand(addLogoutCommand())
 
 	err = cmd.Execute()
 	if err != nil {
