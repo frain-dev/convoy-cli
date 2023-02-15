@@ -95,6 +95,11 @@ func NewConfig(host, apiKey string) (*Config, error) {
 			c.ActiveApiKey = apiKey
 		}
 		return c, nil
+	} else {
+		err = os.Mkdir(homedir+"/.convoy", 0777)
+		if err != nil && !os.IsExist(err) {
+			return nil, fmt.Errorf("failed to create config directory: %v", err)
+		}
 	}
 
 	c.Host = host
