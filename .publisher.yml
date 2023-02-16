@@ -1,0 +1,95 @@
+project_name: convoy-cli
+
+before:
+  hooks:
+    - go mod tidy
+builds:
+  - env:
+      - CGO_ENABLED=0
+    main: ./cmd
+    id: cobin
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+
+  - id: lib
+    skip: true
+
+# https://goreleaser.com/customization/archive/
+archives:
+  - name_template: "{{ .ProjectName}}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    id: cobin-archive
+    builds: 
+      - cobin
+
+# https://goreleaser.com/customization/nfpm/
+nfpms:
+  - id: deb
+    license: MPL-2.0
+    maintainer: frain-dev
+    homepage: https://getconvoy.io/
+    description: "A tool for debugging convoy webhook events locally"
+    file_name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    formats:
+      - deb
+
+  - id: rpm
+    license: MPL-2.0
+    maintainer: frain-dev
+    homepage: https://getconvoy.io/
+    description: "A tool for debugging convoy webhook events locally"
+    file_name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    formats:
+      - rpm
+
+# https://goreleaser.com/customization/publishers/
+publishers:
+  - name: cloudsmith-raw
+    ids:
+      - cobin-archive
+    dir: "{{ dir .ArtifactPath }}"
+    cmd: cloudsmith push raw --version={{ .Version }} convoy/convoy-cli {{ .ArtifactName }}
+    env: 
+     - CLOUDSMITH_API_KEY={{ .Env.CLOUDSMITH_API_KEY }}
+
+  - name: cloudsmith-deb
+    ids: 
+     - deb
+    dir: "{{ dir .ArtifactPath }}"
+    cmd: cloudsmith push deb convoy/convoy-cli/any-distro/any-version {{ .ArtifactName }}
+    env: 
+     - CLOUDSMITH_API_KEY={{ .Env.CLOUDSMITH_API_KEY }}
+
+  - name: cloudsmith-rpm
+    ids: 
+     - rpm
+    dir: "{{ dir .ArtifactPath }}"
+    cmd: cloudsmith push rpm convoy/convoy-cli/any-distro/any-version {{ .ArtifactName }}
+    env: 
+     - CLOUDSMITH_API_KEY={{ .Env.CLOUDSMITH_API_KEY }}
+
+# https://goreleaser.com/customization/homebrew/
+brews:
+  - name: convoy-cli
+    homepage: https://getconvoy.io/
+    description: A tool for debugging convoy webhook events locally
+    license: MPL-2.0
+    skip_upload: auto
+    commit_author:
+      name: frain-dev
+      email: dev@frain.dev
+    tap:
+      owner: frain-dev
+      name: homebrew-tools
+    url_template: https://dl.cloudsmith.io/public/convoy/convoy-cli/raw/versions/{{.Version}}/{{ .ArtifactName }}
+
+checksum:
+  name_template: "{{ .ProjectName}}_checksums.txt"
+
+release:
+  ids:
+    - lib
