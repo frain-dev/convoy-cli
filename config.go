@@ -58,21 +58,17 @@ func LoadConfig() (*Config, error) {
 		return nil, errors.New("config file not found")
 	}
 
-	if c.hasDefaultConfigFile {
-		data, err := os.ReadFile(path)
-		if err != nil {
-			return nil, err
-		}
-
-		err = yaml.Unmarshal(data, &c)
-		if err != nil {
-			return nil, err
-		}
-
-		return c, nil
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
 	}
 
-	return nil, nil
+	err = yaml.Unmarshal(data, &c)
+	if err != nil {
+		return nil, err
+	}
+
+	return c, nil
 }
 
 func NewConfig(host, apiKey string) (*Config, error) {
@@ -136,8 +132,8 @@ func (c *Config) HasDefaultConfigFile() bool {
 	return c.hasDefaultConfigFile
 }
 
-func (c *Config) UpdateConfig(response *LoginResponse) error {
-	if len(response.Projects) > 0 && util.IsStringEmpty(c.ActiveProjectID) {
+func (c *Config) UpdateConfig(response *LoginResponse, isLogin bool) error {
+	if len(response.Projects) > 0 && isLogin {
 		c.ActiveProjectID = response.Projects[0].Project.UID
 	}
 
@@ -205,16 +201,6 @@ func (c *Config) UpdateConfig(response *LoginResponse) error {
 	}
 
 	return nil
-}
-
-func doesEndpointExist(c *Config, endpointId string) bool {
-	for _, endpoint := range c.Projects {
-		if endpoint.UID == endpointId {
-			return true
-		}
-	}
-
-	return false
 }
 
 func HasDefaultConfigFile(path string) bool {
