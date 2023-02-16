@@ -27,7 +27,7 @@ func addLoginCommand() *cobra.Command {
 		SilenceUsage:      true,
 		PersistentPostRun: func(cmd *cobra.Command, args []string) {},
 		Run: func(cmd *cobra.Command, args []string) {
-			err := login(host, apiKey, false)
+			err := login(host, apiKey, true)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -40,7 +40,7 @@ func addLoginCommand() *cobra.Command {
 	return cmd
 }
 
-func login(host, apiKey string, isRefresh bool) error {
+func login(host, apiKey string, isLogin bool) error {
 	c, err := convoyCli.NewConfig(host, apiKey)
 	if err != nil {
 		return err
@@ -87,20 +87,19 @@ func login(host, apiKey string, isRefresh bool) error {
 		return err
 	}
 
-	err = c.UpdateConfig(response)
+	err = c.UpdateConfig(response, isLogin)
 	if err != nil {
 		return err
 	}
 
-	if isRefresh {
-		fmt.Println("Refresh Project list Successful!")
+	if isLogin {
+		fmt.Println("Login Success!")
+		fmt.Println("Name:", response.UserName)
+		fmt.Println("Host:", host)
 		return nil
 	}
 
-	fmt.Println("Login Success!")
-	fmt.Println("Name:", response.UserName)
-	fmt.Println("Host:", host)
-
+	fmt.Println("Refresh Project list Successful!")
 	return nil
 }
 

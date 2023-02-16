@@ -34,7 +34,7 @@ func addProjectCommand() *cobra.Command {
 			}
 
 			if refresh {
-				err := login("", "", true)
+				err := login("", "", false)
 				if err != nil {
 					log.Fatal(err)
 				}

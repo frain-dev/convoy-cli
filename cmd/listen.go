@@ -63,6 +63,10 @@ func addListenCommand() *cobra.Command {
 
 			p := FindProjectById(c.Projects, c.ActiveProjectID)
 
+			if p == nil {
+				log.Fatal("Active Project not found\nRun `convoy-cli project --switch-to {project_id}` to switch to a valid project")
+			}
+
 			listenRequest := convoyCli.ListenRequest{
 				HostName:   c.Host,
 				ProjectID:  c.ActiveProjectID,
