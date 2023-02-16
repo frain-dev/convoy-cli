@@ -31,10 +31,9 @@ func addListenCommand() *cobra.Command {
 				log.Fatal("flag forward-to cannot be empty")
 			}
 
-			// TODO(all): enforce the sourceName filter?
-			// if util.IsStringEmpty(sourceName) {
-			// 	log.Fatal("flag sourceName cannot be empty")
-			// }
+			if util.IsStringEmpty(sourceName) {
+				log.Fatal("flag source-name cannot be empty")
+			}
 
 			hostInfo, err := url.Parse(c.Host)
 			if err != nil {
