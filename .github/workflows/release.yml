@@ -1,0 +1,45 @@
+name: Release Go Binaries
+
+on:
+  workflow_dispatch:
+    inputs:
+      name:
+        description: "Manual workflow name"
+        required: true
+  push:
+    tags:
+      # Release binary for every tag.
+      - v0.*
+
+jobs:
+  release-matrix:
+    name: Release & Publish Go Binary
+    needs: [build_ui, analyze-tags]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-go@v2
+        name: Setup go
+        with:
+          go-version: 1.17
+
+      - uses: actions/setup-python@v3
+        name: Setup Python
+        with:
+          python-version: '3.9'
+
+      - name: Install Cloudsmith CLI
+        run: |
+         echo $(pip --version)
+         pip install --upgrade cloudsmith-cli
+         echo $(cloudsmith --version)
+
+      - uses: goreleaser/goreleaser-action@v2
+        name: Release, Upload & Publish
+        with:
+          version: latest
+          args: -f .publisher.yml release --rm-dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+          REPO_NAME: ${{ github.repository }}
+          CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
+
