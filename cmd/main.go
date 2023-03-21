@@ -17,7 +17,7 @@ func main() {
 	cmd := &cobra.Command{
 		Use:     "convoy-cli",
 		Version: convoyCli.GetVersion(),
-		Short:   "Convoy CLI for debugging your events locally",
+		Short:   "Client CLI for debugging your events locally",
 	}
 
 	cmd.AddCommand(addListenCommand())
