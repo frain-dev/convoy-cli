@@ -24,6 +24,7 @@ func main() {
 	cmd.AddCommand(addLoginCommand())
 	cmd.AddCommand(addProjectCommand())
 	cmd.AddCommand(addLogoutCommand())
+	cmd.AddCommand(addLStatusCommand())
 
 	err = cmd.Execute()
 	if err != nil {

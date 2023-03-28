@@ -203,6 +203,10 @@ func (c *Config) UpdateConfig(response *LoginResponse, isLogin bool) error {
 	return nil
 }
 
+func (c Config) FindPro() {
+
+}
+
 func HasDefaultConfigFile(path string) bool {
 	if _, err := os.Stat(path); err != nil {
 		return false
