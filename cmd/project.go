@@ -19,11 +19,8 @@ func addProjectCommand() *cobra.Command {
 	var projectId string
 
 	cmd := &cobra.Command{
-		Use:               "project",
-		Short:             "Switch, List or Refresh projects",
-		SilenceUsage:      true,
-		PersistentPreRun:  func(cmd *cobra.Command, args []string) {},
-		PersistentPostRun: func(cmd *cobra.Command, args []string) {},
+		Use:   "project",
+		Short: "Switch, List or Refresh projects",
 		Run: func(cmd *cobra.Command, args []string) {
 			if list {
 				err := listProjects()

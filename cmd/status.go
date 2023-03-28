@@ -8,11 +8,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func addLStatusCommand() *cobra.Command {
+func addStatusCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:          "status",
-		Short:        "Checks status of the cli login",
-		SilenceUsage: true,
+		Use:   "status",
+		Short: "Checks status of the cli login",
 		Run: func(cmd *cobra.Command, args []string) {
 			c, err := convoyCli.LoadConfig()
 			if err != nil {
