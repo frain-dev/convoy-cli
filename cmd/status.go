@@ -11,7 +11,7 @@ import (
 func addLStatusCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:          "status",
-		Short:        "Starts a websocket client that listens to events streamed by the server",
+		Short:        "Checks status of the cli login",
 		SilenceUsage: true,
 		Run: func(cmd *cobra.Command, args []string) {
 			c, err := convoyCli.LoadConfig()
