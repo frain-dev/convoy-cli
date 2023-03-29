@@ -8,11 +8,8 @@ import (
 
 func addLogoutCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:               "logout",
-		Short:             "Logs out of your Convoy instance",
-		SilenceUsage:      true,
-		PersistentPreRun:  func(cmd *cobra.Command, args []string) {},
-		PersistentPostRun: func(cmd *cobra.Command, args []string) {},
+		Use:   "logout",
+		Short: "Logs out of your Convoy instance",
 		Run: func(cmd *cobra.Command, args []string) {
 			err := cli.DeleteConfigFile()
 			if err != nil {

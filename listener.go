@@ -65,7 +65,7 @@ func (l *Listener) Listen(listenRequest *ListenRequest, hostInfo *url.URL) {
 				log.Fatal("Error parsing request body", e)
 			}
 			defer response.Body.Close()
-			log.Fatalln("websocket dialer failed with response: ", string(buf))
+			log.WithError(err).Fatalln("websocket dialer failed with response: ", string(buf))
 		}
 
 		log.Fatal(err)

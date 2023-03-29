@@ -22,10 +22,8 @@ func addLoginCommand() *cobra.Command {
 	var host string
 
 	cmd := &cobra.Command{
-		Use:               "login",
-		Short:             "Logs into your Convoy instance using a Personal API Key",
-		SilenceUsage:      true,
-		PersistentPostRun: func(cmd *cobra.Command, args []string) {},
+		Use:   "login",
+		Short: "Logs into your Convoy instance using a Personal API Key",
 		Run: func(cmd *cobra.Command, args []string) {
 			err := login(host, apiKey, true)
 			if err != nil {
